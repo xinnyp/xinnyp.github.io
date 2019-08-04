@@ -4,27 +4,74 @@ title:  "A quick guide to Plotly"
 date:   2019-07-31
 categories: [tutorial]
 ---
-Python has a good selection of visualisation packages to work with. I have worked with and tried out a few, namely seaborn, ggplot and matplotlib.
-While I like the simplicity of how easy it is to plot graph with those libraries, I always wished there was more interactivity. I had a go at bokeh but found the transitions to be a but clunky and felt I wanted something sleeker.
-Then I discovered plotly! I think it actually required an account when I first heard of it but I revisited earlier this year and to my surprise, it was available offline and free! I have been playing with it ever since and everyone who has seen it has also been impressed!
+Python has a good selection of visualisation packages to work with. I have worked with and tried out a few, namely seaborn, ggplot and matplotlib. While I like the simplicity of how easy it is to plot graph with those libraries, I always wished there was more interactivity.
 
-That being said it also has its limitations. It's quite heavy and slow to load compared to other non-interactive libs and sometimes plotting can seem quite a lengthy process so it definitely isn't a library I would use for every occasion.
+Then I discovered plotly!
 
-If like me, you want to make pretty, interactive plots without having to worry about JS, HTML or CSS *and* don't like trawling through docs, I have written a brief guide to getting started with plotly without an account in Jupyter Notebooks.
+As with any library, it has its limitations. It's quite heavy and slow to load compared to other non-interactive libs and there are several ways to plot one graph so getting started can seem a bit confusing. I want to go through 2 different methods of plotting: plotly graph objects and a cufflinks.
+
+If like me, you want to make pretty, interactive plots without having to make an account or worry about JS, HTML or CSS, here's a short tutorial for you.
 <!--more-->
-
 
 First things first, import the relevant libs and start the notebook mode which allows you to show plots in jupyter.:
 
 {% highlight python%}
 import plotly.offline as py
 import plotly.graph_objs as go
+import pandas as pd
 py.init_notebook_mode()
 {% endhighlight %}
 
-There are several options when graphing with plotly. When working with a small amount of data, I like taking the following approach as it allows the most customisation.
+Next, I will make a pandas dataframe for my data. This isn't  necessary in all the three separate libraries but for the purpose of this tutorial, it allows for good comparison of code length.
 
-Load the data:
+{% highlight python%}
+x = ['SQL', 'Python', 'Excel']
+y = [80, 50, 30]
+df = pd.DataFrame({'Topics': x, '% usage at work': y})
+df.head()
+{% endhighlight %}
+
+Now you're ready to plot! First, plotting with **plotly graph objects**:
+
+{% highlight python%}
+    # load the data
+data = [go.Bar(
+    x=df['Topics'], # assign x axis as Topics column
+    y=df['% usage at work'] # assign y axis as % usage at work column 
+)]
+    # define the layout
+layout = go.Layout(
+    title='Languages used at work'
+)
+fig = go.Figure(data=data, layout=layout)
+     #plot the figure
+py.iplot(fig, filename='pandas-bar-chart')
+{% endhighlight%}
+
+{% include pandas-bar-chart.html %}
+
+Now, let's try **cufflinks**
+
+{%highlight python%}
+import cufflinks as cf
+cf.go_offline()
+
+df.iplot(kind='bar', x='Topics', y='% usage at work', title = 'Languages used at work')
+{% endhighlight %}
+
+{% include cufflinks_example.html %}
+
+
+The plotting has been reduced to a single line! This is because cufflinks is a *wrapper* for the plotly API that has been specifically crafted to simplify plotting pandas dataframes with plotly.
+
+However, at the time of writing, cufflinks doesn't support all of the graph objects in plotly (the list of supported graph types is growing, check it out [here]('However, at the time of writing, cufflinks doesn't support all of the graph objects in plotly (the list of supported graph types is growing, check it out [here](https://github.com/santosjorge/cufflinks)) 
+)) so it's best to use a mix of the two depending on your visualisation requirements. 
+
+For example, here's a  scatter polar graph that is currently not available in cufflinks.
+
+{% include skills_radar_graph.html %}
+
+Code:
 {% highlight python%}
 data = [go.Scatterpolar(
   r = [80, 55, 20, 40, 50, 21, 30, 45, 50],
@@ -33,11 +80,6 @@ data = [go.Scatterpolar(
     line_color='#abd5ed'
 )]
 
-{% endhighlight %}
-
-Define the layout parameters:
-
-{% highlight python%}
 layout = go.Layout(
     title='Confidence in commonly used Python libraries',
   polar = dict(
@@ -48,15 +90,7 @@ layout = go.Layout(
   ),
   showlegend = False
 )
-{% endhighlight %}
 
-Plot the figure!
-
-{% highlight python%}
 fig = go.Figure(data=data, layout=layout)
 py.iplot(fig, filename = "radar/basic")
 {% endhighlight %}
-
-{% include skills_radar_graph.html %}
-
-However, a great addition to plotly is cufflinks! Cufflinks allows you to plot pandas dataframes with much fewer lines but you are limited to specific types of graphs.

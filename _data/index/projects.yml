@@ -1,3 +1,7 @@
 - name: Air Pollution Scraper
   descr: "I have made a script that allows us to scrape information from the KCL clean air API and output a pandas dataframe. Also allows you to plot graphs."
   github: https://github.com/xinnyp/air-pollution-analysis
+
+- name: BBC iPlayer Analysis Dashboard
+  descr: "Interactive dashboard to visualise some BBC iPlayer usage Data"
+  github: https://github.com/xinnyp/bbciplayerdashboard
